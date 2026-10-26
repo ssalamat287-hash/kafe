@@ -1,0 +1,45 @@
+import telebot
+from telebot import types
+
+TOKEN = "8838436380:AAGChR5G3nnkJcJC57vMPF7PmWbrnS1_LE"
+bot = telebot.TeleBot(TOKEN)
+
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn1 = types.KeyboardButton('📋 Menyu')
+    btn2 = types.KeyboardButton('📞 Baylanıs / Manzil')
+    markup.add(btn1, btn2)
+    
+    bot.send_message(
+        message.chat.id,
+        f"Assalawma áleykum, {message.from_user.first_name}!\n"
+        "«Ush Kazan» kafesiniń rásmiy botına xosh kelipsiz.\n"
+        "Tómendegi túymeler arqalı menyu menen tanısıń:",
+        reply_markup=markup
+    )
+
+@bot.message_handler(func=lambda message: True)
+def handle_message(message):
+    if message.text == '📋 Menyu':
+        markup = types.InlineKeyboardMarkup()
+        btn_palaw = types.InlineKeyboardButton('🍲 Palaw hám Djiiz', callback_data='palaw')
+        markup.add(btn_palaw)
+        
+        bot.send_message(message.chat.id, "Kategoriya tańlań:", reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    if call.data == 'palaw':
+        text = (
+            '🍲 **PALAWLAR HÁM DJIIZ:**\n\n'
+            '• Djiiz 0.5kg - 110 000 sum\n'
+            '• Djiiz 1kg - 220 000 sum\n'
+            '• Tashkent palawı (komplekt) - 43 000 sum\n'
+            '• Samarqand palawı (komplekt) - 48 000 sum\n'
+            '• Uyğur lag\'man - 30 000 sum\n'
+            '• Shorpa - 30 000 sum'
+        )
+        bot.send_message(call.message.chat.id, text, parse_mode='Markdown')
+
+bot.polling(none_stop=True)
